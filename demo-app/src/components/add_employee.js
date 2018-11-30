@@ -14,7 +14,7 @@ class Add extends React.Component {
             Shift: '',
             Blood_group: '',
             redirect: false
-        }
+        } 
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleName = this.handleName.bind(this);
         this.handleEmail = this.handleEmail.bind(this);
