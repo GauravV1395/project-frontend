@@ -8,11 +8,17 @@ class Edit extends React.Component {
         super(props);
         this.state = {
             Name: this.props.location.state.employee_details.name,
+            nameError: '',
             Email: this.props.location.state.employee_details.email,
+            emailError: '',
             Address: this.props.location.state.employee_details.address,
+            addressError: '',
             Mobile: this.props.location.state.employee_details.mobile_number,
+            mobileError: '',
             Shift: this.props.location.state.employee_details.shift,
+            shiftError: '',
             Blood_group: this.props.location.state.employee_details.blood_group,
+            blood_groupError: '',
             redirect: false
         }
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -67,36 +73,97 @@ class Edit extends React.Component {
         })
     }
 
-    handleSubmit(e) {
-        e.preventDefault(); 
-        let submitValue = {
-            name: this.state.Name,
-            email: this.state.Email,
-            address: this.state.Address,
-            mobile_number: this.state.Mobile,
-            shift: this.state.Shift,
-            blood_group: this.state.Blood_group
+    validate = () => {
+        let isError = false;
+        const errors = {
+            nameError: '',
+            emailError: '',
+            addressError: '',
+            mobileError: '',
+            shiftError: '',
+            blood_groupError: ''
+        };
+        //console.log(errors);
+        if (this.state.Name.length < 5) {
+            isError = true;
+            errors.nameError = 'Username must atleast be 5 characters long.'
+        }
+
+        if (!this.state.Email.includes('@')) {
+            isError = true;
+            errors.emailError = 'Enter a valid email address.'
+        }
+
+        if (this.state.Address.length < 10) {
+            isError = true;
+            errors.addressError = "enter a valid address."
+        }
+
+        if (this.state.Mobile.length !== 10) {
+            isError = true;
+            errors.mobileError = "Enter a valid mobile number";
+        }
+
+        if (this.state.Shift === '' || this.state.Shift === 'select') {
+            isError = true;
+            errors.shiftError = "Please select valid shift timings.";
+        }
+
+        if (this.state.Blood_group === '' || this.state.Blood_group === 'select') {
+            isError = true;
+            errors.blood_groupError = "Please select the blood group of the employee."
         }
 
         
-        axios.put(`http://localhost:3001/employees/${this.props.match.params.id}`, submitValue).then((response) => {
-            console.log(response.data);
-            this.setState({ employee: response.data })
+        this.setState({
+            ...this.state,
+            ...errors
+        })
+
+        return isError;
+    }
+
+    handleSubmit(e) {
+        e.preventDefault();
+        const err = this.validate();
+        if (!err) {
             this.setState({
-                redirect: true
-            })
-        });
+                nameError: '',
+                emailError: '',
+                addressError: '',
+                mobileError: '',
+                shiftError: '',
+                blood_groupError: ''
+            });
+
+            let submitValue = {
+                name: this.state.Name,
+                email: this.state.Email,
+                address: this.state.Address,
+                mobile_number: this.state.Mobile,
+                shift: this.state.Shift,
+                blood_group: this.state.Blood_group
+            }
+
+            axios.put(`http://localhost:3001/employees/${this.props.match.params.id}`, submitValue).then((response) => {
+                console.log(response.data);
+                this.setState({ employee: response.data })
+                this.setState({
+                    redirect: true
+                })
+            });
+        }
     }
 
     deleteHandle(e) {
         e.preventDefault();
 
         axios.delete(`http://localhost:3001/employees/${this.props.match.params.id}`).then((response) => {
-            this.setState({redirect: true});
+            this.setState({ redirect: true });
         })
     }
 
-   
+
 
     render() {
         const { redirect } = this.state;
@@ -105,44 +172,46 @@ class Edit extends React.Component {
         }
         return (
             <div>
-            <form onSubmit={this.handleSubmit}>
-                <label>Name
-                <input type='text' onChange={this.handleName} value={this.state.Name} />
-                </label>
-                <br />
-                <label>Email
-                <input type='text' onChange={this.handleEmail} value={this.state.Email} />
-                </label><br />
-                <label>Address
-                <input type='textArea' onChange={this.handleAddress} value={this.state.Address} />
-                </label><br />
-                <label>Mobile
-            <input type='text' onChange={this.handleMobile} value={this.state.Mobile} /></label><br />
-                <label>Shift
-            <select onChange={this.handleShift} value={this.state.Shift}>
-                        <option value="9:30-18:30">9:30-18:30</option>
-                        <option value='13:30-22:30'>13:30-22:30</option>
-                        <option value='18:30-1:30'>18:30-1:30</option>
-                        <option value='21:30-6:30'>21:30-6:30</option>
-                    </select>
-                </label><br />
-                <label>
-                    Blood_group
-            <select onChange={this.handleGroup} value={this.state.Blood_group}>
-                        <option value='O+'>O+</option>
-                        <option value='O-'>O-</option>
-                        <option value='AB+'>AB+</option>
-                        <option value='AB-'>AB-</option>
-                        <option value='B+'>B+</option>
-                        <option value='B-'>B-</option>
-                        <option value='A+'>A+</option>
-                        <option value='A-'>A-</option>
-                    </select>
-                </label><br />
-                <input type='submit' value='edit user' />
-            </form>
-            <button><Link to='/employees'>back</Link></button>
-            <button><Link to={`employees/delete/${this.props.match.params.id}`} onClick = {this.deleteHandle}>Delete</Link></button>
+                <form onSubmit={this.handleSubmit}>
+                    <label>Name
+                <input type='text' onChange={this.handleName} value={this.state.Name} errortext={this.state.nameError} />
+                    </label>
+                    <span>{this.state.nameError}</span>
+                    <br />
+                    <label>Email
+                <input type='text' onChange={this.handleEmail} value={this.state.Email} errortext={this.state.emailError} />
+                    </label><span>{this.state.emailError}</span><br />
+                    <label>Address
+                <input type='textArea' onChange={this.handleAddress} value={this.state.Address} errortext={this.state.addressError} />
+                    </label><span>{this.state.addressError}</span><br />
+                    <label>Mobile
+            <input type='text' onChange={this.handleMobile} value={this.state.Mobile} errortext={this.state.mobileError} />
+                    </label><span>{this.state.mobileError}</span><br />
+                    <label>Shift
+            <select onChange={this.handleShift} value={this.state.Shift} errortext={this.state.shiftError}>
+                            <option value="9:30-18:30">9:30-18:30</option>
+                            <option value='13:30-22:30'>13:30-22:30</option>
+                            <option value='18:30-1:30'>18:30-1:30</option>
+                            <option value='21:30-6:30'>21:30-6:30</option>
+                        </select>
+                    </label><span>{this.state.shiftError}</span><br />
+                    <label>
+                        Blood_group
+            <select onChange={this.handleGroup} value={this.state.Blood_group} errortext={this.state.blood_groupError}>
+                            <option value='O+'>O+</option>
+                            <option value='O-'>O-</option>
+                            <option value='AB+'>AB+</option>
+                            <option value='AB-'>AB-</option>
+                            <option value='B+'>B+</option>
+                            <option value='B-'>B-</option>
+                            <option value='A+'>A+</option>
+                            <option value='A-'>A-</option>
+                        </select>
+                    </label><span>{this.state.blood_groupError}</span><br />
+                    <input type='submit' value='edit user' />
+                </form>
+                <button><Link to='/employees'>back</Link></button>
+                <button><Link to={`employees/delete/${this.props.match.params.id}`} onClick={this.deleteHandle}>Delete</Link></button>
             </div>
         )
     }

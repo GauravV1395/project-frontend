@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const DriverTable = (props) => (
     <table border = '2'>
@@ -30,6 +31,8 @@ const DriverTable = (props) => (
                       <td>{driver.aadhar_number}</td>
                       <td>{driver.driving_license}</td>
                       <td>{driver.blood_group}</td>
+                      <td><Link to= {{pathname: `drivers/${driver._id}`, state: {driver_details: driver}}}>View</Link></td>
+                      <td><Link to= {{pathname: `drivers/edit/${driver._id}`, state: {driver_details: driver}}}>Edit</Link></td>
                       </tr>
                   ))
               }
