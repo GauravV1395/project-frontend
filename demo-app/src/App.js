@@ -9,7 +9,11 @@ import Edit from './components/update_employee';
 import AddDriver from './components/AddDriver';
 import ShowOneDriver from './components/showOneDriver';
 import EditDriver from './components/EditDriver';
- 
+import Trips from './components/trips_list';
+import ListOne from './components/showOneTrip';
+import AddTrip from './components/add_trip';
+import EditTrip from './components/edit_trip'
+
 const Home = () => <h2>Home</h2>
 
 const AppRouter = () => (
@@ -19,6 +23,7 @@ const AppRouter = () => (
         <Link to='/'> Home</Link>
         <button><Link to='/employees'>Employee</Link></button>
         <button><Link to='/drivers'>Drivers</Link></button>
+        <button><Link to='/trips'>Trips</Link></button>
         
       </nav>
       <Switch>
@@ -31,6 +36,10 @@ const AppRouter = () => (
       <Route path= '/drivers/new' exact component = {AddDriver}/>
       <Route path= '/drivers/:id' exact component = {ShowOneDriver}/>
       <Route path= '/drivers/edit/:id' exact component = {EditDriver}/>
+      <Route path= '/trips' exact component ={Trips}/>
+      <Route path= '/trips/add' exact component ={AddTrip}/>
+      <Route path= '/trips/:id' exact component = {ListOne}/>
+      <Route path= '/trips/edit/:id' exact component = {EditTrip}/>
       </Switch>
      
     </div>

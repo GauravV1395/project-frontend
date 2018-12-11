@@ -93,6 +93,7 @@ class AddDriver extends React.Component {
         this.setState({
             Car: e.target.value
         })
+        console.log(this.state.Car);
     }
 
     handleBlood_group(e) {

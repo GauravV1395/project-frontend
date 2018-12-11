@@ -1,6 +1,8 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
- 
+import ReactTable from 'react-table';
+import 'react-table/react-table.css';
+    
 const EmployeeTable = (props) => (
     <table border='2'>
         <thead>
