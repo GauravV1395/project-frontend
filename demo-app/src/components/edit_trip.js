@@ -1,240 +1,178 @@
 import React from 'react';
 import axios from 'axios';
-import ReactTable from 'react-table';
-import 'react-table/react-table.css';
+import Select from 'react-select';
 import { Redirect } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import difference from 'lodash';
 
-let submitValue = {};
-let selectedDriver;
-let shift;
-let Pick_up;
-let route;
 
 class EditTrip extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            selectedShift: this.props.location.state.trip_details.shift,
+            selectedPick: this.props.location.state.trip_details.pick_up,
+            selectedRoute: this.props.location.state.trip_details.route,
+            selectedEmployees: this.props.location.state.trip_details.employees,
+            selectedDriver: this.props.location.state.trip_details.driver,
+            shifts : ['9:30-18:30', '18:30-1:30','13:30-22:30','21:30-6:30'],
+            Pick_up: ['18:45', '1:45', '22:45', '6:45'],
+            routes: ['Route1', 'Route2', 'Route3', 'Route4', 'Route5'],
             employees: [],
             drivers: [],
-            selectedEmployees: [],
-            redirect:false
-        }
-        this.handleShift = this.handleShift.bind(this);
+            employeeToBeRemoved: [],
+            employeeAdded: [],
+            selectedOption: [],
+            redirect: false
+            
+        }   
+        this.handleChange = this.handleChange.bind(this);
         this.handlePick = this.handlePick.bind(this);
         this.handleRoute = this.handleRoute.bind(this);
-        this.handleSelected = this.handleSelected.bind(this);
+        this.handleSelectedDriver = this.handleSelectedDriver.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.AddEmployee = this.AddEmployee.bind(this);
+        this.onChangeHandle = this.onChangeHandle.bind(this);
     }
-
-    handleShift(e) {
+    handleChange(e) {
         e.preventDefault();
-         shift = e.target.value
-        axios.get(`http://localhost:3001/employees/shifts/${shift}`).then((employees) => {
-            console.log(employees.data);
-            this.setState({ employees: employees.data })
-        });
-    }
-         
-    handleRoute(e) {
-        e.preventDefault();
-         route = e.target.value
-        axios.get(`http://localhost:3001/employees/route/${route}`).then((employees) => {
-            console.log(employees.data);
-            this.setState({ employees: employees.data });
+        this.setState({
+            selectedShift: e.target.value
+        }, () => {
+            console.log(this.state.selectedShift);
+            axios.get(`http://localhost:3001/employees/shifts/${this.state.selectedShift}`).then((res) => {
+                console.log(res.data);
+                this.setState({
+                    employees: res.data
+                })
+            })
         })
     }
 
     componentDidMount() {
-        axios.get(`http://localhost:3001/drivers`).then((drivers) => {
-            console.log(drivers.data);
-            this.setState({ drivers: drivers.data });
+        axios.get(`http://localhost:3001/drivers`).then((response) => {
+            this.setState({drivers: response.data});
         })
+        axios.get(`http://localhost:3001/employees`).then((response) => {
+            this.setState({employees: response.data});
+        })
+        let selected = [];
+        this.props.location.state.trip_details.employees.forEach(function(n) {selected.push({value: n._id, label: n.name})})
+        console.log(selected);
+        this.setState({selectedOption: selected});
     }
 
-    handleSelected(e) {
-         selectedDriver = e.target.value;
-        //this.setState({selectedDriver: e.target.value});
 
-        console.log(selectedDriver);
+    handleSelectedDriver(e) {
+        e.preventDefault();
+       this.setState({selectedDriver : e.target.value}, () => {
+           return this.state.selectedDriver;
+       });
     }
 
     handlePick(e) {
         e.preventDefault();
-        Pick_up = e.target.value
-        console.log(Pick_up)
+        this.setState({selectedPick : e.target.value}, () => {
+            console.log(this.state.selectedPick);
+        });
     }
 
-    AddEmployee(employee) {
-        this.state.selectedEmployees.push(employee._id);
-        console.log(this.state.selectedEmployees);
+     AddEmployee() {
+        
+     }
+
+    handleRoute(e) {
+        e.preventDefault();
+        this.setState({selectedRoute: e.target.value}, () => {
+            console.log(this.state.selectedRoute);
+            axios.get(`http://localhost:3001/employees/route/${this.state.selectedRoute}`).then((response) => {
+                this.setState({employees: response.data});
+            })
+        })
     }
-    
+
+    onChangeHandle(selectedOption, deselectoption) {
+        this.setState({selectedOption: selectedOption}, () => {
+            console.log(deselectoption);
+            if (deselectoption.action == "remove-value") {
+                this.state.employeeToBeRemoved.push(deselectoption.removedValue.value);
+                console.log(this.state.employeeToBeRemoved);
+            } else if (deselectoption.action == "select-option") {
+                this.state.employeeAdded.push(deselectoption.option.value);
+                console.log(this.state.employeeAdded);
+                console.log(this.state.selectedOption);
+            }
+        })
+    }
+
     handleSubmit(e) {
         e.preventDefault();
-        submitValue.driver = selectedDriver;
-        submitValue.pick_up = Pick_up;
-        submitValue.employees = this.state.selectedEmployees;
-        submitValue.route = route;
-        submitValue.shift = this.state.shift;
+        let selectedEmployees = [];
+        this.state.selectedOption.map((option) => {
+            selectedEmployees.push(option.value);
+        })
+        console.log(selectedEmployees);
+        let submitValue = {
+            removedEmployee: this.state.employeeToBeRemoved,
+            employees: selectedEmployees,
+            driver: this.state.selectedDriver,
+            shift: this.state.selectedShift,
+            route: this.state.selectedRoute,
+            pick_up: this.state.selectedPick
+        }
         console.log(submitValue);
-        axios.post(`http://localhost:3001/trips`, submitValue).then((response) => {
+        axios.put(`http://localhost:3001/trips/${this.props.match.params.id}`, submitValue).then((response) => {
             console.log(response);
-        })
-        this.setState({
-            redirect: true
-        })
+        //     this.setState({redirect: true});
+       });
     }
-
+   
     render() {
-        console.log(this.props.location.state.trip_details.employees);
         const { redirect } = this.state;
         if (redirect) {
-            return <Redirect to="/trips" exact />
+            return <Redirect to="/drivers" exact />
         }
-        const columns = [
-            {
-                Header: "Id",
-                accessor: "_id",
-                style: {
-                    textAlign: "right"
-                },
-                width: 250,
-                maxWidth: 250,
-                minWidth: 250
-            },
-            {
-                Header: "Name",
-                accessor: "name",
-                style: {
-                    textAlign: "right"
-                },
-                width: 100,
-                maxWidth: 100,
-                minWidth: 100
-            },
-            {
-                Header: "Email",
-                accessor: "email",
-                style: {
-                    textAlign: "right"
-                }
-            },
-            {
-                Header: "Mobile Number",
-                accessor: "mobile_number",
-                style: {
-                    textAlign: "right"
-                },
-                width: 200,
-                maxWidth: 200,
-                minWidth: 200
-            },
-            {
-                Header: "Address",
-                accessor: "address",
-                style: {
-                    textAlign: "right"
-                }
-            },
-            {
-                Header: "Route",
-                accessor: "route",
-                style: {
-                    textAlign: "right"
-                }
-            },
-            {
-                Header: "Shift",
-                accessor: "shift",
-                sortable: false,
-                filterable: false,
-                style: {
-                    textAlign: "right"
-                },
-                width: 100,
-                maxWidth: 100,
-                minWidth: 100
-            },
-            {
-                Header: "Blood Group",
-                accessor: "blood_group",
-                sortable: false,
-                filterable: false,
-                style: {
-                    textAlign: "right"
-                },
-                width: 100,
-                maxWidth: 100,
-                minWidth: 100
-            },
-            {
-                Header: "Actions",
-                Cell: props => {
-                    return (
-                        <button style={{ backgroundColor: "blue", color: "#fefefe" }} onClick={(e) => {
-                            e.preventDefault();
-                            this.AddEmployee(props.original);
-                        }}>Add</button>
-                    )
-                },
-                sortable: false,
-                filterable: false,
-                style: {
-                    textAlign: "right"
-                },
-                width: 100,
-                maxWidth: 100,
-                minWidth: 100
-            }
-        ]
-        return (  
-            <div>
-                <form onSubmit={this.handleSubmit}>
-                <p>Sort By</p> <br />
-                <label>Shifts</label>
-                <select onChange={this.handleShift} value={this.state.shift}>
-                    <option value='select'>Select</option>
-                    <option value='9:30-18:30'>9:30-18:30</option>
-                    <option value='13:30-22:30'>13:30-22:30</option>
-                    <option value='18:30-1:30'>18:30-1:30</option>
-                    <option value='21:30-6:30'>21:30-6:30</option>
-                </select><br />
+        const options = [];
+        this.state.employees.forEach(function(employee) {
+            options.push({value: employee._id, label: employee.name});
+        })
+       
+            return (
+                <div>
+                    <form onSubmit = {this.handleSubmit}>
+                    <label>Shifts</label>
+                    <select onChange={this.handleChange} value={this.state.selectedShift}>
+                        {this.state.shifts.map((shift, index) => {
+                            return (<option key={index} value={shift}>{shift}</option>)
+                        })}
+                    </select><br/>
 
-                <label>Pick_up</label>
-                <select onChange={this.handlePick} value={this.state.pick}>
-                    <option value="select">Select</option>
-                    <option value='18:45'>18:45</option>
-                    <option value='22:45'>22:45</option>
-                    <option value='1:45'>1:45</option>
-                    <option value='6:45'>6:45</option>
+                    <label>Pick_up</label>
+                <select onChange={this.handlePick} value={this.state.selectedPick}>
+                    {this.state.Pick_up.map((pick_up, index) => {
+                        return (<option key={index} value={pick_up}>{pick_up}</option>)
+                    })}
                 </select><br />
-                <label>Route
-                <select ref = {(input)=> this.menu = input} onChange={this.handleRoute} value={this.state.route}>
-                        <option value="select">Select</option>
-                        <option value='Route1'>Route1</option>
-                        <option value='Route2'>Route2</option>
-                        <option value='Route3'>Route3</option>
-                        <option value='Route4'>Route4</option>
-                        <option value='Route5'>Route5</option>
+                    
+                <label>Route</label>
+                <select onChange={this.handleRoute} value={this.state.selectedRoute}>
+                        {this.state.routes.map((route, index) => {
+                            return (<option key = {index} value = {route}>{route}</option>)
+                        })}
                     </select><br />
-                </label><br />
-                <label>Driver
-                <select onChange = {this.handleSelected} value={this.state.drivers}>
-                <option>Select</option>
+
+                <label>Driver</label>
+                <select onChange = {this.handleSelectedDriver} value={this.state.selectedDriver}>
                     {this.state.drivers.map((driver, index) => (
                         <option value = {driver._id} key={index}>{driver.name}</option>
                     ))}
-                </select></label><br/>
-
-                <ReactTable columns={columns} data={this.state.employees} filterable defaultPageSize={5} noDataText={"Please Wait..."}>
-
-                </ReactTable><br/>
-                <input type="submit" value='add trip' />
+                </select><br/>
+                <Select isSearchable value = {this.state.selectedOption} isMulti onChange = {this.onChangeHandle} options = {options} />
+                <input type = "submit" value = "submit"/>
                 </form>
                 <button><Link to='/trips'>Back</Link></button>
-            </div>
-        )
+                </div>
+            )
     }
 }
 
