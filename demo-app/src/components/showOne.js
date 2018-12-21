@@ -21,6 +21,7 @@ class ShowOne extends React.Component {
                             <th>mobile_number</th>
                             <th>address</th>
                             <th>shift</th>
+                            <th>Route</th>
                             <th>blood group</th>
                         </tr>
                     </thead>
@@ -34,6 +35,7 @@ class ShowOne extends React.Component {
                                 <td>{this.state.employee.mobile_number}</td>
                                 <td>{this.state.employee.address}</td>
                                 <td>{this.state.employee.shift}</td>
+                                <td>{this.state.employee.route}</td>
                                 <td>{this.state.employee.blood_group}</td>
                             </tr>
                         }

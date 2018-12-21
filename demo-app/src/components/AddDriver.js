@@ -15,7 +15,8 @@ class AddDriver extends React.Component {
             mobileError: '',
             Address: '',
             addressError: '',
-            Car: '',
+            Car: ['sedan', 'hatchback','electric','tt', 'shuttle'],
+            selectedCar: 'sedan',
             carError: '',
             Reg_Num: '',
             reg_numError: '',
@@ -23,7 +24,8 @@ class AddDriver extends React.Component {
             aadharError: '',
             License: '',
             licenseError: '',
-            Blood_group: '',
+            Blood_group: ['O+', 'O-', 'AB+', 'AB-', 'B+', 'B-', 'A+', 'A-'],
+            selectedGroup: 'O+',
             blood_groupError: '',
             redirect: false
         }
@@ -91,7 +93,7 @@ class AddDriver extends React.Component {
     handleCar(e) {
         e.preventDefault();
         this.setState({
-            Car: e.target.value
+            selectedCar: e.target.value
         })
         console.log(this.state.Car);
     }
@@ -99,7 +101,7 @@ class AddDriver extends React.Component {
     handleBlood_group(e) {
         e.preventDefault();
         this.setState({
-            Blood_group: e.target.value
+            selectedGroup: e.target.value
         })
     }
 
@@ -138,12 +140,12 @@ class AddDriver extends React.Component {
             errors.mobileError = "Enter a valid mobile number";
         }
 
-        if (this.state.Blood_group === '' || this.state.Blood_group === 'select') {
+        if (this.state.selectedGroup === '' ) {
             isError = true;
             errors.blood_groupError = "Please select the blood group of the driver."
         }
 
-        if (this.state.Car === '' || this.state.Car === 'select') {
+        if (this.state.selectedCar === '' ) {
             isError = true;
             errors.carError = "Please select the type of car."
         }
@@ -195,8 +197,8 @@ class AddDriver extends React.Component {
             aadhar_number: this.state.Aadhar,
             driving_license: this.state.License,
             reg_num: this.state.Reg_Num,
-            blood_group: this.state.Blood_group,
-            car_type: this.state.Car
+            blood_group: this.state.selectedGroup,
+            car_type: this.state.selectedCar
         }
         axios.post('http://localhost:3001/drivers/', submitValue).then((response) => {
             console.log(response.data);
@@ -243,27 +245,18 @@ class AddDriver extends React.Component {
                     </label><span>{this.state.driving_license}</span><br />
 
                     <label>Car Type
-                    <select onChange={this.handleCar} value={this.state.Car} errortext={this.state.carError}>
-                            <option value='select'>Select</option>
-                            <option value='seadan'>Sedan</option>
-                            <option value='hatchback'>Hatchback</option>
-                            <option value='electric'>Electric</option>
-                            <option value='tt'>Tempo</option>
-                            <option value='shuttle'>Shuttle</option>
+                    <select onChange={this.handleCar} errortext={this.state.carError}>
+                           {this.state.Car.map((car,index) => {
+                               return (<option value = {car} key = {index}>{car}</option>)
+                           })}
                         </select>
                     </label><span>{this.state.carError}</span><br />
 
                     <label>Blood_group
-                    <select onChange={this.handleBlood_group} value={this.state.Blood_group} errortext={this.state.blood_groupError}>
-                            <option value='select'>Select</option>
-                            <option value='O+'>O+</option>
-                            <option value='O-'>O-</option>
-                            <option value='AB+'>AB+</option>
-                            <option value='AB-'>AB-</option>
-                            <option value='B+'>B+</option>
-                            <option value='B-'>B-</option>
-                            <option value='A+'>A+</option>
-                            <option value='A-'>A-</option>
+                    <select onChange={this.handleBlood_group} errortext={this.state.blood_groupError}>
+                           {this.state.Blood_group.map((blood, index) => {
+                               return (<option value = {blood} key = {index}>{blood}</option>)
+                           })}
                         </select>
                     </label><span>{this.state.blood_groupError}</span><br />
                     <input type="submit" value='add driver' />

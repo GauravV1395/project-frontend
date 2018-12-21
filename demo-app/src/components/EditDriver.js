@@ -15,7 +15,8 @@ class EditDriver extends React.Component {
             mobileError: '',
             Address: this.props.location.state.driver_details.address,
             addressError: '',
-            Car: this.props.location.state.driver_details.car_type,
+            Car: ['sedan', 'hatchback','electric','tt', 'shuttle'],
+            selectedCar: this.props.location.state.driver_details.car_type,
             carError: '',
             Reg_Num: this.props.location.state.driver_details.reg_num,
             reg_numError: '',
@@ -23,8 +24,8 @@ class EditDriver extends React.Component {
             aadharError: '',
             License: this.props.location.state.driver_details.driving_license,
             licenseError: '',
-            Blood_group: this.props.location.state.driver_details.blood_group,
-            blood_groupError: '',
+            Blood_group: ['O+', 'O-', 'AB+', 'AB-', 'B+', 'B-', 'A+', 'A-'], 
+            selectedGroup: this.props.location.state.driver_details.blood_group,
             redirect: false
         }
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -92,14 +93,14 @@ class EditDriver extends React.Component {
     handleCar(e) {
         e.preventDefault();
         this.setState({
-            Car: e.target.value
+            selectedCar: e.target.value
         })
     }
 
     handleBlood_group(e) {
         e.preventDefault();
         this.setState({
-            Blood_group: e.target.value
+            selectedGroup: e.target.value
         })
     }
 
@@ -138,12 +139,12 @@ class EditDriver extends React.Component {
             errors.mobileError = "Enter a valid mobile number";
         }
 
-        if (this.state.Blood_group === '' || this.state.Blood_group === 'select') {
+        if (this.state.selectedGroup === '' || this.state.Blood_group === 'select') {
             isError = true;
             errors.blood_groupError = "Please select the blood group of the driver."
         }
 
-        if (this.state.Car === '' || this.state.Car === 'select') {
+        if (this.state.selectedCar === '' || this.state.Car === 'select') {
             isError = true;
             errors.carError = "Please select the type of car."
         }
@@ -195,8 +196,8 @@ class EditDriver extends React.Component {
             aadhar_num: this.state.Aadhar,
             driving_license: this.state.License,
             reg_num: this.state.Reg_Num,
-            blood_group: this.state.Blood_group,
-            car_type: this.state.Car
+            blood_group: this.state.selectedGroup,
+            car_type: this.state.selectedCar
         }
         axios.put(`http://localhost:3001/drivers/${this.props.match.params.id}`, submitValue).then((response) => {
             this.setState({drivers: response.data})
@@ -253,33 +254,24 @@ class EditDriver extends React.Component {
                     </label><span>{this.state.licenseError}</span><br />
 
                     <label>Car Type
-                    <select onChange={this.handleCar} value={this.state.Car} errortext={this.state.carError}>
-                            <option value='select'>Select</option>
-                            <option value='seadan'>Sedan</option>
-                            <option value='hatchback'>Hatchback</option>
-                            <option value='electric'>Electric</option>
-                            <option value='tt'>Tempo</option>
-                            <option value='shuttle'>Shuttle</option>
+                    <select onChange={this.handleCar} defaultValue={this.state.selectedCar} errortext={this.state.carError}>
+                    {this.state.Car.map((car, index) => {
+                                return (<option key = {index} value={car}>{car}</option>)
+                            })}
                         </select>
                     </label><span>{this.state.carError}</span><br />
 
                     <label>Blood_group
-                    <select onChange={this.handleBlood_group} value={this.state.Blood_group} errortext={this.state.blood_groupError}>
-                            <option value='select'>Select</option>
-                            <option value='O+'>O+</option>
-                            <option value='O-'>O-</option>
-                            <option value='AB+'>AB+</option>
-                            <option value='AB-'>AB-</option>
-                            <option value='B+'>B+</option>
-                            <option value='B-'>B-</option>
-                            <option value='A+'>A+</option>
-                            <option value='A-'>A-</option>
+                    <select onChange={this.handleBlood_group} value={this.state.selectedGroup} errortext={this.state.blood_groupError}>
+                    {this.state.Blood_group.map((blood, index) => {
+                                return (<option key = {index} value = {blood}>{blood}</option>)
+                            })}
                         </select>
                     </label><span>{this.state.blood_groupError}</span><br />
                     <input type="submit" value='Edit driver' />
                 </form>
-                <Link to="/drivers">back</Link>
                 <button><Link to= {`drivers/delete/${this.props.match.params.id}`} onClick = {this.deleteHandle}>Delete</Link></button>
+                <Link to="/drivers">back</Link>
             </div>
         )
     }

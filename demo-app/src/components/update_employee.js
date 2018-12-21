@@ -11,13 +11,18 @@ class Edit extends React.Component {
             nameError: '',
             Email: this.props.location.state.employee_details.email,
             emailError: '',
-            Address: this.props.location.state.employee_details.address,
+            Address: this.props.location.state.employee_details.address, 
             addressError: '',
             Mobile: this.props.location.state.employee_details.mobile_number,
             mobileError: '',
-            Shift: this.props.location.state.employee_details.shift,
+            Shift: ['9:30-18:30', '18:30-1:30','13:30-22:30','21:30-6:30'],
+            Selectedshift: this.props.location.state.employee_details.shift,
             shiftError: '',
-            Blood_group: this.props.location.state.employee_details.blood_group,
+            Route: ['Route1', 'Route2', 'Route3', 'Route4', 'Route5'],
+            Selectedroute: this.props.location.state.employee_details.route,
+            routeError: '',
+            Selectedgroup: this.props.location.state.employee_details.blood_group,
+            Blood_group: ['O+', 'O-', 'AB+', 'AB-', 'B+', 'B-', 'A+', 'A-'],
             blood_groupError: '',
             redirect: false
         }
@@ -29,6 +34,7 @@ class Edit extends React.Component {
         this.handleGroup = this.handleGroup.bind(this);
         this.handleAddress = this.handleAddress.bind(this);
         this.deleteHandle = this.deleteHandle.bind(this);
+        this.handleRoute = this.handleRoute.bind(this);
     }
 
     handleName(e) {
@@ -62,14 +68,21 @@ class Edit extends React.Component {
     handleShift(e) {
         e.preventDefault()
         this.setState({
-            Shift: e.target.value
+            Selectedshift: e.target.value
         })
     }
 
     handleGroup(e) {
         e.preventDefault()
         this.setState({
-            Blood_group: e.target.value
+            Selectedgroup: e.target.value
+        })
+    }
+
+    handleRoute(e) {
+        e.preventDefault();
+        this.setState({
+            Selectedroute: e.target.value
         })
     }
 
@@ -81,6 +94,7 @@ class Edit extends React.Component {
             addressError: '',
             mobileError: '',
             shiftError: '',
+            routeError: '',
             blood_groupError: ''
         };
         //console.log(errors);
@@ -104,14 +118,19 @@ class Edit extends React.Component {
             errors.mobileError = "Enter a valid mobile number";
         }
 
-        if (this.state.Shift === '' || this.state.Shift === 'select') {
+        if (this.state.Selectedshift === '') {
             isError = true;
             errors.shiftError = "Please select valid shift timings.";
         }
 
-        if (this.state.Blood_group === '' || this.state.Blood_group === 'select') {
+        if (this.state.SelectedShift === '') {
             isError = true;
             errors.blood_groupError = "Please select the blood group of the employee."
+        }
+
+        if (this.state.Selectedroute === '') {
+            isError = true;
+            errors.routeError = "Please select the route for the employee."
         }
 
         
@@ -133,6 +152,7 @@ class Edit extends React.Component {
                 addressError: '',
                 mobileError: '',
                 shiftError: '',
+                routeError: '',
                 blood_groupError: ''
             });
 
@@ -141,8 +161,9 @@ class Edit extends React.Component {
                 email: this.state.Email,
                 address: this.state.Address,
                 mobile_number: this.state.Mobile,
-                shift: this.state.Shift,
-                blood_group: this.state.Blood_group
+                shift: this.state.Selectedshift,
+                blood_group: this.state.Selectedgroup,
+                route: this.state.Selectedroute
             }
 
             axios.put(`http://localhost:3001/employees/${this.props.match.params.id}`, submitValue).then((response) => {
@@ -157,7 +178,6 @@ class Edit extends React.Component {
 
     deleteHandle(e) {
         e.preventDefault();
-
         axios.delete(`http://localhost:3001/employees/${this.props.match.params.id}`).then((response) => {
             this.setState({ redirect: true });
         })
@@ -166,6 +186,7 @@ class Edit extends React.Component {
 
 
     render() {
+        console.log(this.props.location);
         const { redirect } = this.state;
         if (redirect) {
             return <Redirect to="/employees" exact />
@@ -188,24 +209,25 @@ class Edit extends React.Component {
             <input type='text' onChange={this.handleMobile} value={this.state.Mobile} errortext={this.state.mobileError} />
                     </label><span>{this.state.mobileError}</span><br />
                     <label>Shift
-            <select onChange={this.handleShift} value={this.state.Shift} errortext={this.state.shiftError}>
-                            <option value="9:30-18:30">9:30-18:30</option>
-                            <option value='13:30-22:30'>13:30-22:30</option>
-                            <option value='18:30-1:30'>18:30-1:30</option>
-                            <option value='21:30-6:30'>21:30-6:30</option>
+            <select defaultValue = {this.state.Selectedshift} onChange={this.handleShift} errortext={this.state.shiftError}>
+                            {this.state.Shift.map((shift, index) => {
+                            return (<option key={index} value={shift}>{shift}</option>)
+                        })}
                         </select>
                     </label><span>{this.state.shiftError}</span><br />
+                    <label>Route
+                    <select defaultValue = {this.state.Selectedroute} onChange={this.handleRoute} errortext={this.state.routeError}>
+                            {this.state.Route.map((route, index) => {
+                                return (<option key = {index} value={route}>{route}</option>)
+                            })}
+                        </select>
+                    </label> <span>{this.state.routeError}</span><br />
                     <label>
                         Blood_group
-            <select onChange={this.handleGroup} value={this.state.Blood_group} errortext={this.state.blood_groupError}>
-                            <option value='O+'>O+</option>
-                            <option value='O-'>O-</option>
-                            <option value='AB+'>AB+</option>
-                            <option value='AB-'>AB-</option>
-                            <option value='B+'>B+</option>
-                            <option value='B-'>B-</option>
-                            <option value='A+'>A+</option>
-                            <option value='A-'>A-</option>
+            <select defaultValue = {this.state.Selectedgroup} onChange={this.handleGroup} errortext={this.state.blood_groupError}>
+                                {this.state.Blood_group.map((blood, index) => {
+                                return (<option key = {index} value = {blood}>{blood}</option>)
+                            })}
                         </select>
                     </label><span>{this.state.blood_groupError}</span><br />
                     <input type='submit' value='edit user' />

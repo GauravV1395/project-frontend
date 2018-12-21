@@ -15,9 +15,14 @@ class Add extends React.Component {
             addressError: '',
             Mobile: '',
             mobileError: '',
-            Shift: '',
+            Shift: ['9:30-18:30', '18:30-1:30','13:30-22:30','21:30-6:30'],
+            Selectedshift: '9:30-18:30',
             shiftError: '',
-            Blood_group: '',
+            Route: ['Route1', 'Route2', 'Route3', 'Route4', 'Route5'],
+            Selectedroute: 'Route1', 
+            routeError: '',
+            Blood_group: ['O+', 'O-', 'AB+', 'AB-', 'B+', 'B-', 'A+', 'A-'],
+            Selectedgroup: 'O+',
             blood_groupError: '',
             redirect: false
         }
@@ -28,6 +33,7 @@ class Add extends React.Component {
         this.handleShift = this.handleShift.bind(this);
         this.handleGroup = this.handleGroup.bind(this);
         this.handleAddress = this.handleAddress.bind(this);
+        this.handleRoute = this.handleRoute.bind(this);
     }
 
     validate = () => {
@@ -38,6 +44,7 @@ class Add extends React.Component {
             addressError: '',
             mobileError: '',
             shiftError: '',
+            routeError: '',
             blood_groupError: ''
         };
         //console.log(errors);
@@ -61,16 +68,20 @@ class Add extends React.Component {
             errors.mobileError = "Enter a valid mobile number";
         }
 
-        if (this.state.Shift === '' || this.state.Shift === 'select') {
+        if (this.state.Selectedshift === '') {
             isError = true;
             errors.shiftError = "Please select valid shift timings.";
         }
 
-        if (this.state.Blood_group === '' || this.state.Blood_group === 'select') {
+        if (this.state.Selectedgroup === '') {
             isError = true;
             errors.blood_groupError = "Please select the blood group of the employee."
         }
 
+        if (this.state.Selectedroute === '') {
+            isError = true;
+            errors.routeError = "Please select the route for the employee."
+        }
         
         this.setState({
             ...this.state,
@@ -91,6 +102,7 @@ class Add extends React.Component {
             addressError: '',
             mobileError: '',
             shiftError: '',
+            routeError: '',
             blood_groupError: ''
             });
 
@@ -99,8 +111,9 @@ class Add extends React.Component {
                 email: this.state.Email,
                 address: this.state.Address,
                 mobile_number: this.state.Mobile,
-                shift: this.state.Shift,
-                blood_group: this.state.Blood_group
+                shift: this.state.Selectedshift,
+                route: this.state.Selectedroute,
+                blood_group: this.state.Selectedgroup
             }
             axios.post('http://localhost:3001/employees/', submitValue).then((response) => {
                 console.log(response.data.employee);
@@ -148,7 +161,14 @@ class Add extends React.Component {
     handleShift(e) {
         e.preventDefault();
         this.setState({
-            Shift: e.target.value
+            Selectedshift: e.target.value
+        })
+    }
+
+    handleRoute(e) {
+        e.preventDefault();
+        this.setState({
+            Selectedroute : e.target.value
         })
     }
 
@@ -156,7 +176,7 @@ class Add extends React.Component {
     handleGroup(e) {
         e.preventDefault();
         this.setState({
-            Blood_group: e.target.value
+            Selectedgroup : e.target.value
         })
     }
 
@@ -180,27 +200,25 @@ class Add extends React.Component {
                     <label>Mobile
                     <input type='text' onChange={this.handleMobile} value={this.state.Mobile} errortext={this.mobileError} />
                     </label> <span>{this.state.mobileError}</span><br />
-                    <label>Shift
-                    <select onChange={this.handleShift} value={this.state.Shift} errortext={this.state.shiftError}>
-                            <option value='select'>Select</option>
-                            <option value="9:30-18:30">9:30-18:30</option>
-                            <option value='13:30-22:30'>13:30-22:30</option>
-                            <option value='18:30-1:30'>18:30-1:30</option>
-                            <option value='21:30-6:30'>21:30-6:30</option>
+                    <label>Shifts</label>
+                    <select onChange={this.handleShift} errortext={this.state.shiftError}>
+                        {this.state.Shift.map((shift, index) => {
+                            return (<option key={index} value={shift}>{shift}</option>)
+                        })}
+                    </select><span>{this.state.shiftError}</span><br/>
+                    <label>Route
+                    <select onChange={this.handleRoute} errortext={this.state.routeError}>
+                            {this.state.Route.map((route, index) => {
+                                return (<option key = {index} value={route}>{route}</option>)
+                            })}
                         </select>
-                    </label> <span>{this.state.shiftError}</span><br />
+                    </label> <span>{this.state.routeError}</span><br />
                     <label>
                         Blood_group
-                    <select onChange={this.handleGroup} value={this.state.Blood_group} errortext={this.state.blood_groupError}>
-                            <option value='select'>Select</option>
-                            <option value='O+'>O+</option>
-                            <option value='O-'>O-</option>
-                            <option value='AB+'>AB+</option>
-                            <option value='AB-'>AB-</option>
-                            <option value='B+'>B+</option>
-                            <option value='B-'>B-</option>
-                            <option value='A+'>A+</option>
-                            <option value='A-'>A-</option>
+                    <select onChange={this.handleGroup} errortext={this.state.blood_groupError}>
+                            {this.state.Blood_group.map((blood, index) => {
+                                return (<option key = {index} value = {blood}>{blood}</option>)
+                            })}
                         </select>
                     </label> <span>{this.state.blood_groupError}</span><br />
                     <input type="submit" value='add user' />

@@ -1,7 +1,5 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
-import ReactTable from 'react-table';
-import 'react-table/react-table.css';
     
 const EmployeeTable = (props) => (
     <table border='2'>
@@ -12,6 +10,7 @@ const EmployeeTable = (props) => (
                 <th>email</th>
                 <th>mobile_number</th>
                 <th>address</th>
+                <th>route</th>
                 <th>shift</th>
                 <th>blood group</th>
             </tr>
@@ -25,6 +24,7 @@ const EmployeeTable = (props) => (
                         <td>{employee.email}</td>
                         <td>{employee.mobile_number}</td>
                         <td>{employee.address}</td>
+                        <td>{employee.route}</td>
                         <td>{employee.shift}</td>
                         <td>{employee.blood_group}</td>
                         {/* <td><Link to={`employees/${employee._id}`}>View</Link></td> */}

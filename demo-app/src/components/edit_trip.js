@@ -3,7 +3,6 @@ import axios from 'axios';
 import Select from 'react-select';
 import { Redirect } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import difference from 'lodash';
 
 
 class EditTrip extends React.Component {
@@ -31,8 +30,8 @@ class EditTrip extends React.Component {
         this.handleRoute = this.handleRoute.bind(this);
         this.handleSelectedDriver = this.handleSelectedDriver.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
-        this.AddEmployee = this.AddEmployee.bind(this);
         this.onChangeHandle = this.onChangeHandle.bind(this);
+        this.deleteHandle = this.deleteHandle.bind(this);
     }
     handleChange(e) {
         e.preventDefault();
@@ -77,9 +76,13 @@ class EditTrip extends React.Component {
         });
     }
 
-     AddEmployee() {
-        
-     }
+    deleteHandle(e) {
+        e.preventDefault();
+        axios.delete(`http://localhost:3001/trips/${this.props.match.params.id}`).then((response) => {
+            console.log(response);    
+            this.setState({redirect: true});
+        })
+    }
 
     handleRoute(e) {
         e.preventDefault();
@@ -123,14 +126,14 @@ class EditTrip extends React.Component {
         console.log(submitValue);
         axios.put(`http://localhost:3001/trips/${this.props.match.params.id}`, submitValue).then((response) => {
             console.log(response);
-        //     this.setState({redirect: true});
+             this.setState({redirect: true});
        });
     }
    
     render() {
         const { redirect } = this.state;
         if (redirect) {
-            return <Redirect to="/drivers" exact />
+            return <Redirect to="/trips" exact />
         }
         const options = [];
         this.state.employees.forEach(function(employee) {
@@ -170,6 +173,7 @@ class EditTrip extends React.Component {
                 <Select isSearchable value = {this.state.selectedOption} isMulti onChange = {this.onChangeHandle} options = {options} />
                 <input type = "submit" value = "submit"/>
                 </form>
+                <button><Link to= {`trips/delete/${this.props.match.params.id}`} onClick = {this.deleteHandle}>Delete</Link></button>
                 <button><Link to='/trips'>Back</Link></button>
                 </div>
             )
