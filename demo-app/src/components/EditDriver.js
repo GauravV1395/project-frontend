@@ -134,17 +134,17 @@ class EditDriver extends React.Component {
             errors.addressError = "enter a valid address."
         }
 
-        if (this.state.Mobile.length !== 10) {
+        if (this.state.Mobile.length >= 15) {
             isError = true;
             errors.mobileError = "Enter a valid mobile number";
         }
 
-        if (this.state.selectedGroup === '' || this.state.Blood_group === 'select') {
+        if (this.state.selectedGroup === '' ) {
             isError = true;
             errors.blood_groupError = "Please select the blood group of the driver."
         }
 
-        if (this.state.selectedCar === '' || this.state.Car === 'select') {
+        if (this.state.selectedCar === '' ) {
             isError = true;
             errors.carError = "Please select the type of car."
         }

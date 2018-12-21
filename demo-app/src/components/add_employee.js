@@ -63,7 +63,7 @@ class Add extends React.Component {
             errors.addressError = "enter a valid address."
         }
 
-        if (this.state.Mobile.length !== 10) {
+        if (this.state.Mobile.length >= 15) {
             isError = true;
             errors.mobileError = "Enter a valid mobile number";
         }

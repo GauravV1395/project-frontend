@@ -22,7 +22,12 @@ class EditTrip extends React.Component {
             employeeToBeRemoved: [],
             employeeAdded: [],
             selectedOption: [],
-            redirect: false
+            shiftError: '',
+            pickError: '',
+            routeError: '',
+            selectedEmployeesError: '',
+            selectedOptionError: '',
+            redirect: false,
             
         }   
         this.handleChange = this.handleChange.bind(this);
@@ -33,6 +38,50 @@ class EditTrip extends React.Component {
         this.onChangeHandle = this.onChangeHandle.bind(this);
         this.deleteHandle = this.deleteHandle.bind(this);
     }
+
+    validate = () => {
+        let isError = false;
+        const errors = {
+            shiftError: ``,
+            pickError: ``,
+            routeError: ``,
+            selectedEmployeesError: ``,
+            selectedDriverError: ``,
+        }
+
+        if (this.state.selectedShift === '') {
+            isError = true;
+            errors.shiftError = 'Please select the shift.'
+        }
+
+        if (this.state.selectedPick === '') {
+            isError = true;
+            errors.pickError = 'Please select the pickup time.'
+        }
+
+        if (this.state.selectedRoute === '') {
+            isError = true;
+            errors.routeError = 'Please select the route.'
+        }
+
+        if (this.state.selectedEmployees.length <= 0) {
+            isError = true;
+            errors.selectedEmployeesError = 'Please add the employees to the trip.'
+        }
+
+        if (this.state.selectedDriver === '') {
+            isError = true;
+            errors.selectedDriverError = 'Please select the driver to the trip.'
+        }
+
+        this.setState({
+            ...this.state,
+            ...errors
+        })
+
+        return isError;
+    }
+
     handleChange(e) {
         e.preventDefault();
         this.setState({
@@ -110,11 +159,20 @@ class EditTrip extends React.Component {
 
     handleSubmit(e) {
         e.preventDefault();
+        const err = this.validate();
         let selectedEmployees = [];
         this.state.selectedOption.map((option) => {
             selectedEmployees.push(option.value);
         })
         console.log(selectedEmployees);
+        if (!err) {
+            this.setState({
+                shiftError: '',
+                routeError: '',
+                pickError: '',
+                selectedDriverError: '',
+                selectedEmployeesError: ''
+            });
         let submitValue = {
             removedEmployee: this.state.employeeToBeRemoved,
             employees: selectedEmployees,
@@ -129,6 +187,7 @@ class EditTrip extends React.Component {
              this.setState({redirect: true});
        });
     }
+}
    
     render() {
         const { redirect } = this.state;
@@ -144,33 +203,34 @@ class EditTrip extends React.Component {
                 <div>
                     <form onSubmit = {this.handleSubmit}>
                     <label>Shifts</label>
-                    <select onChange={this.handleChange} value={this.state.selectedShift}>
+                    <select onChange={this.handleChange} value={this.state.selectedShift} errortext = {this.state.shiftError}>
                         {this.state.shifts.map((shift, index) => {
                             return (<option key={index} value={shift}>{shift}</option>)
                         })}
-                    </select><br/>
+                    </select><span>{this.state.shiftError}</span><br/>
 
                     <label>Pick_up</label>
-                <select onChange={this.handlePick} value={this.state.selectedPick}>
+                <select onChange={this.handlePick} value={this.state.selectedPick} errortext = {this.state.pickError}>
                     {this.state.Pick_up.map((pick_up, index) => {
                         return (<option key={index} value={pick_up}>{pick_up}</option>)
                     })}
-                </select><br />
+                </select><span>{this.state.pickError}</span><br />
                     
                 <label>Route</label>
-                <select onChange={this.handleRoute} value={this.state.selectedRoute}>
+                <select onChange={this.handleRoute} value={this.state.selectedRoute} errortext = {this.state.routeError}>
                         {this.state.routes.map((route, index) => {
                             return (<option key = {index} value = {route}>{route}</option>)
                         })}
-                    </select><br />
+                    </select><span>{this.state.routeError}</span><br />
 
                 <label>Driver</label>
-                <select onChange = {this.handleSelectedDriver} value={this.state.selectedDriver}>
+                <select onChange = {this.handleSelectedDriver} value={this.state.selectedDriver} errortext = {this.state.selectedDriverError}>
                     {this.state.drivers.map((driver, index) => (
                         <option value = {driver._id} key={index}>{driver.name}</option>
                     ))}
-                </select><br/>
-                <Select isSearchable value = {this.state.selectedOption} isMulti onChange = {this.onChangeHandle} options = {options} />
+                </select><span>{this.state.selectedDriverError}</span><br/>
+                <Select isSearchable value = {this.state.selectedOption} isMulti onChange = {this.onChangeHandle} options = {options} errortext = {this.state.selectedOptionError}/>
+                <span>{this.state.selectedOptionError}</span><br/>
                 <input type = "submit" value = "submit"/>
                 </form>
                 <button><Link to= {`trips/delete/${this.props.match.params.id}`} onClick = {this.deleteHandle}>Delete</Link></button>
