@@ -12,9 +12,11 @@ import EditDriver from './components/EditDriver';
 import Trips from './components/trips_list';
 import ListOne from './components/showOneTrip';
 import AddTrip from './components/add_trip';
-import EditTrip from './components/edit_trip'
+import EditTrip from './components/edit_trip';
+import Chat from './components/chat';
 
-const Home = () => <h2>Home</h2>
+
+const Home = () => <Chat />
 
 const AppRouter = () => (
   <Router>

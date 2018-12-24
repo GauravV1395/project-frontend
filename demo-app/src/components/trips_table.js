@@ -1,10 +1,24 @@
 import React from 'react';
 import { Link } from "react-router-dom";
+import strftime from 'strftime';
+
+// class Date extends React.Component  {
+//     constructor(props) {
+//         super(props);
+//         this.state = {
+//             date: ''
+//         }
+//         this.setState({
+//             date: strftime('%B %d, %Y %H:%M:%S', props.trip_details.date)
+//         })
+//     }  
+// }
 
 const TripTable = (props) => (
     <table border = '2'>
         <thead>
             <tr>
+                <th>date</th>
                 <th>id</th>
                 <th>employees</th>
                 <th>driver</th>
@@ -17,6 +31,7 @@ const TripTable = (props) => (
             {
                 props.trips_details.map((trip, index) => (
                     <tr key={index}>
+                        <td>{strftime('%F %T', new Date(trip.date))}</td>
                         <td>{trip._id}</td>
                         <td>{trip.employees.map((employee, index) => (<ul key = {index}><li>{employee.name}</li></ul>))}</td>
                         <td>{trip.driver.name}</td>

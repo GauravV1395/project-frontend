@@ -1,5 +1,7 @@
 import React from 'react';
-import {Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import strftime from 'strftime';
+
 
 class ListOne extends React.Component {
     constructor(props) {
@@ -10,12 +12,13 @@ class ListOne extends React.Component {
     }
 
     render() {
-        
+
         return (
             <div>
-                <table border= "2">
+                <table border="2">
                     <thead>
                         <tr>
+                            <th>date</th>
                             <th>id</th>
                             <th>employees</th>
                             <td>driver</td>
@@ -27,8 +30,9 @@ class ListOne extends React.Component {
                     <tbody>
                         {
                             <tr>
+                                <td>{strftime('%F %T', new Date(this.state.trip.date))}</td>
                                 <td>{this.state.trip._id}</td>
-                                <td>{this.state.trip.employees.map((employee, index) => (<ul key = {index}><li>{employee.name}</li></ul>))}</td>
+                                <td>{this.state.trip.employees.map((employee, index) => (<ul key={index}><li>{employee.name}</li></ul>))}</td>
                                 <td>{this.state.trip.driver.name}</td>
                                 <td>{this.state.trip.shift}</td>
                                 <td>{this.state.trip.route}</td>
@@ -36,7 +40,7 @@ class ListOne extends React.Component {
                             </tr>
                         }
                     </tbody>
-                </table><br/>
+                </table><br />
                 <button><Link to='/trips'>Back</Link></button>
             </div>
         )

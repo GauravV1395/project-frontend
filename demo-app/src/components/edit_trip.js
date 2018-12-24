@@ -106,7 +106,6 @@ class EditTrip extends React.Component {
         })
         let selected = [];
         this.props.location.state.trip_details.employees.forEach(function(n) {selected.push({value: n._id, label: n.name})})
-        console.log(selected);
         this.setState({selectedOption: selected});
     }
 
@@ -146,10 +145,10 @@ class EditTrip extends React.Component {
     onChangeHandle(selectedOption, deselectoption) {
         this.setState({selectedOption: selectedOption}, () => {
             console.log(deselectoption);
-            if (deselectoption.action == "remove-value") {
+            if (deselectoption.action === "remove-value") {
                 this.state.employeeToBeRemoved.push(deselectoption.removedValue.value);
                 console.log(this.state.employeeToBeRemoved);
-            } else if (deselectoption.action == "select-option") {
+            } else if (deselectoption.action === "select-option") {
                 this.state.employeeAdded.push(deselectoption.option.value);
                 console.log(this.state.employeeAdded);
                 console.log(this.state.selectedOption);
@@ -162,9 +161,8 @@ class EditTrip extends React.Component {
         const err = this.validate();
         let selectedEmployees = [];
         this.state.selectedOption.map((option) => {
-            selectedEmployees.push(option.value);
+           return selectedEmployees.push(option.value);
         })
-        console.log(selectedEmployees);
         if (!err) {
             this.setState({
                 shiftError: '',
